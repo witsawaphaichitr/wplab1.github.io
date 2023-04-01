@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet"
+        type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+
+    <style>
+        @font-face {
+            font-family: def;
+            src: url('DSN SURADEJ.TTF');
+        }
+
+        #img-container {
+            position: relative;
+            padding: 0;
+            margin: 0;
+            width: fit-content;
+            height: fit-content;
+        }
+
+        #img-container #text1 {
+            position: absolute;
+            top: 587px;
+            right: 72px;
+            font-family: def;
+            font-size: 4.2rem;
+            color: #444348;
+            display: block;
+            text-align: left;
+            padding: 0px
+        }
+
+        #img-container #text2 {
+            position: absolute;
+            top: 348px;
+            right: 40px;
+            font-family: def;
+            font-size: 2.9rem;
+            color: #76757a;
+            display: block;
+            text-align: left;
+            padding: 0px;
+        }
+        #form {
+            margin-bottom: 20px;
+        }
+        #form #text-input {
+            width: 250px;
+            height: 50px;
+            font-size: 2rem;
+        }
+
+        #form button {
+            width: 200px;
+            height: 60px;
+            font-size: 1.4rem;
+        }
+        canvas {
+            max-width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="form">
+        <input type="text" onkeyup="writeText(this)" placeholder="99,999.99" id="text-input" />
+        <button onclick="saveImageWithText();">Download</button>
+    </div>
+    
+    <br />
+    <div id="img-container">
+        <img src="img/slip.jpg" id="slip-img" />
+        <div id="text1">99,999.99</div>
+        <div id="text2">88,888.88</div>
+    </div>
+    <br/>
+</body>
+<script>
+
+    let textContainer;
+    let textContainer2;
+    let t = '99,999.99';
+
+    // Get the values that you have entered in the textarea and
+    // write it in the DIV over the image.
+
+    let writeText = (ele) => {
+        t = ele.value;
+        document.getElementById('text1').innerHTML = t.replace(/\n\r?/g, '<br />');
+        document.getElementById('text2').innerHTML = t.replace(/\n\r?/g, '<br />');
+    }
+
+    // Finally, save the image with text over it.
+    let saveImageWithText = () => {
+        textContainer = document.getElementById('text1');     // The element with the text.
+        textContainer2 = document.getElementById('text2');
+
+        // Create an image object.
+        let img = new Image();
+        img.src = document.getElementById('slip-img').src;
+
+        // Create a canvas object.
+        let canvas = document.createElement("canvas");
+
+        // Wait till the image is loaded.
+        img.onload = function () {
+            drawImage();
+            drawImage2();
+            //document.body.append(canvas);  // Show the image with the text on the Canvas.
+            downloadImage(img.src.replace(/^.*[\\\/]/, ''));    // Download the processed image.
+        }
+        let ctx = canvas.getContext("2d");
+        // Draw the image on the canvas.
+        let drawImage = () => {
+            	// Create canvas context.
+
+            // Assign width and height.
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // Draw the image.
+            ctx.drawImage(img, 0, 0);
+
+            textContainer.style.border = 0;
+
+            // Get the padding etc.
+            let left = parseInt(window.getComputedStyle(textContainer).left);
+            let right = textContainer.getBoundingClientRect().right;
+            let top = parseInt(window.getComputedStyle(textContainer).top, 10);
+            let center = textContainer.getBoundingClientRect().width / 2;
+
+
+            let paddingTop = window.getComputedStyle(textContainer).paddingTop.replace('px', '');
+            let paddingLeft = window.getComputedStyle(textContainer).paddingLeft.replace('px', '');
+            let paddingRight = window.getComputedStyle(textContainer).paddingRight.replace('px', '');
+
+
+            // Get text alignement, colour and font of the text.
+            let txtAlign = window.getComputedStyle(textContainer).textAlign;
+            let color = window.getComputedStyle(textContainer).color;
+            let fnt = window.getComputedStyle(textContainer).font;
+
+
+            // Assign text properties to the context.
+            ctx.font = fnt;
+            ctx.fillStyle = color;
+            ctx.textAlign = txtAlign;
+
+            // Now, we need the coordinates of the text.
+            let x; 		// coordinate.
+            if (txtAlign === 'right') {
+                x = right + parseInt(paddingRight) - 11;
+            }
+            if (txtAlign === 'left') {
+                x = left + parseInt(paddingLeft);
+            }
+            if (txtAlign === 'center') {
+                x = center + left;
+            }
+            // Get the text (it can a word or a sentence) to write over the image.
+            // let str = t.replace(/\n\r?/g, '<br />').split('<br />');
+
+            // finally, draw the text using Canvas fillText() method.
+
+            ctx.fillText(t, x, parseInt(paddingTop, 10) + parseInt(top, 10) + 55);
+            
+        }
+
+        let drawImage2 = () => {
+            textContainer2.style.border = 0;
+
+            // Get the padding etc.
+            let left = parseInt(window.getComputedStyle(textContainer2).left);
+            let right = textContainer2.getBoundingClientRect().right;
+            let top = parseInt(window.getComputedStyle(textContainer2).top, 10);
+            let center = textContainer2.getBoundingClientRect().width / 2;
+
+
+            let paddingTop = window.getComputedStyle(textContainer2).paddingTop.replace('px', '');
+            let paddingLeft = window.getComputedStyle(textContainer2).paddingLeft.replace('px', '');
+            let paddingRight = window.getComputedStyle(textContainer2).paddingRight.replace('px', '');
+
+
+            // Get text alignement, colour and font of the text.
+            let txtAlign = window.getComputedStyle(textContainer2).textAlign;
+            let color = window.getComputedStyle(textContainer2).color;
+            let fnt = window.getComputedStyle(textContainer2).font;
+
+
+            // Assign text properties to the context.
+            ctx.font = fnt;
+            ctx.fillStyle = color;
+            ctx.textAlign = txtAlign;
+
+            // Now, we need the coordinates of the text.
+            let x; 		// coordinate.
+            if (txtAlign === 'right') {
+                x = right + parseInt(paddingRight) - 11;
+            }
+            if (txtAlign === 'left') {
+                x = left + parseInt(paddingLeft);
+            }
+            if (txtAlign === 'center') {
+                x = center + left;
+            }
+            // Get the text (it can a word or a sentence) to write over the image.
+            // let str = t.replace(/\n\r?/g, '<br />').split('<br />');
+
+            // finally, draw the text using Canvas fillText() method.
+
+            ctx.fillText(t, x, parseInt(paddingTop, 10) + parseInt(top, 10) + 38);
+            
+        }
+
+        // Download the processed image.
+        let downloadImage = (img_name) => {
+            let a = document.createElement('a');
+            a.href = canvas.toDataURL("image/png");
+            a.download = img_name;
+            document.body.appendChild(a);
+            a.click();
+        }
+    }
+</script>
+
+</html>
